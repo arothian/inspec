@@ -29,10 +29,10 @@ module Inspec::Targets
       resolve_zip(url, opts)
     end
 
-    def resolve_zip(url, opts)
-      archive = Tempfile.new(['inspec-dl-', '.tar.gz'])
+    # download url into archive using opts,
+    # returns File object and content-type from HTTP headers
+    def download_archive(url, archive, opts)
       archive.binmode
-
       remote = open(
         url,
         http_basic_authentication: [opts['user'] || '', opts['password'] || ''],
@@ -43,7 +43,12 @@ module Inspec::Targets
       archive.rewind
       archive.close
 
-      content_type = remote.meta['content-type']
+      [ archive, remote.meta['content-type'] ]
+    end
+
+    def resolve_zip(url, opts)
+      archive, content_type = download_archive(url, Tempfile.new(['inspec-dl-', '.tar.gz']), opts)
+
       # replace extension with zip if we detected a zip content type
       if ['application/x-zip-compressed', 'application/zip'].include?(content_type)
         # rename file for proper detection in DirHelper
@@ -53,8 +58,8 @@ module Inspec::Targets
 
         content = ZipHelper.new.resolve(new_path)
         File.unlink(new_path)
-      # use tar helper as default
       elsif ['application/x-gzip', 'application/gzip'].include?(content_type)
+        # use tar helper as default (otherwise returns nil)
         content = TarHelper.new.resolve(archive.path)
         archive.unlink
       end

@@ -18,6 +18,7 @@ require 'inspec/resource'
 require 'inspec/backend'
 require 'inspec/profile'
 require 'inspec/targets'
+require 'inspec/targets/zip'
 
 class MockLoader
   # pass the os identifier to emulate a specific operating system
