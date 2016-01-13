@@ -20,8 +20,8 @@ module Inspec::Targets
       return nil unless target.start_with? 'https://' or target.start_with? 'http://'
 
       # support for github url
-      if /^https?:\/\/(www\.)?github\.com\/(?<user>[\w-]+)\/(?<repo>[\w-]+)(\.git)?$/.match(target)
-        url = "https://github.com/#{user}/#{repo}/archive/master.tar.gz"
+      if m = /^https?:\/\/(www\.)?github\.com\/(?<user>[\w-]+)\/(?<repo>[\w-]+)(\.git)?$/.match(target)
+        url = "https://github.com/#{m[:user]}/#{m[:repo]}/archive/master.tar.gz"
       else
         url = target
       end
