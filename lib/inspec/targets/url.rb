@@ -19,9 +19,9 @@ module Inspec::Targets
       # abort if the target does not start with http or https
       return nil unless target.start_with? 'https://' or target.start_with? 'http://'
 
-      # support for github https url
-      if target.start_with? 'https://github.com' and target.end_with? '.git'
-        url = target.sub(/.git$/, '') + '/archive/master.tar.gz'
+      # support for github url
+      if /^https?:\/\/(www\.)?github\.com\/(?<user>[\w-]+)\/(?<repo>[\w-]+)(\.git)?$/.match(target)
+        url = "https://github.com/#{user}/#{repo}/archive/master.tar.gz"
       else
         url = target
       end
